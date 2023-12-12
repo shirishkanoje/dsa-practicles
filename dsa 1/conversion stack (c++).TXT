@@ -1,0 +1,148 @@
+#include <iostream>
+#include <stack>
+#include <string>
+
+using namespace std;
+
+// Node structure for the singly linked list
+struct Node {
+    char data;
+    Node* next;
+};
+
+// Stack class using singly linked list
+class Stack {
+private:
+    Node* top;
+
+public:
+    // Constructor
+    Stack() {
+        top = nullptr;
+    }
+
+    // Function to check if the stack is empty
+    bool isEmpty() {
+        return top == nullptr;
+    }
+
+    // Function to push a character onto the stack
+    void push(char value) {
+        Node* newNode = new Node{value, top};
+        top = newNode;
+    }
+
+    // Function to pop a character from the stack
+    char pop() {
+        if (isEmpty()) {
+            cerr << "Error: Stack is empty.\n";
+            return '\0'; // Return a null character to indicate an error
+        }
+
+        char value = top->data;
+        Node* temp = top;
+        top = top->next;
+        delete temp;
+
+        return value;
+    }
+
+    // Function to return the top character of the stack without popping it
+    char peek() {
+        if (isEmpty()) {
+            cerr << "Error: Stack is empty.\n";
+            return '\0'; // Return a null character to indicate an error
+        }
+
+        return top->data;
+    }
+};
+
+// Function to check if a character is an operator (including unary minus)
+bool isOperator(char ch) {
+    return (ch == '+' || ch == '-' || ch == '*' || ch == '/');
+}
+
+// Function to get the precedence of an operator
+int getPrecedence(char ch) {
+    if (ch == '+' || ch == '-') {
+        return 1;
+    } else if (ch == '*' || ch == '/') {
+        return 2;
+    }
+    return 0;
+}
+
+// Function to convert infix expression to postfix
+string infixToPostfix(const string& infix) {
+    Stack stack;
+    string postfix = "";
+
+    for (char ch : infix) {
+        if (isalnum(ch)) {
+            postfix += ch;
+        } else if (ch == '(') {
+            stack.push(ch);
+        } else if (ch == ')') {
+            while (!stack.isEmpty() && stack.peek() != '(') {
+                postfix += stack.pop();
+            }
+            stack.pop(); // Pop the '(' from the stack
+        } else if (isOperator(ch)) {
+            while (!stack.isEmpty() && getPrecedence(ch) <= getPrecedence(stack.peek())) {
+                postfix += stack.pop();
+            }
+            stack.push(ch);
+        }
+    }
+
+    // Pop remaining operators from the stack
+    while (!stack.isEmpty()) {
+        postfix += stack.pop();
+    }
+
+    return postfix;
+}
+
+// Function to convert infix expression to prefix
+string infixToPrefix(const string& infix) {
+    // Reverse the infix expression, swap '(' with ')' and vice versa, then convert to postfix
+    string reversedInfix = "";
+    for (char ch : infix) {
+        if (ch == '(') {
+            reversedInfix += ')';
+        } else if (ch == ')') {
+            reversedInfix += '(';
+        } else {
+            reversedInfix += ch;
+        }
+    }
+
+    string reversedPostfix = infixToPostfix(reversedInfix);
+
+    // Reverse the postfix expression to get the prefix expression
+    string prefix = "";
+    for (int i = reversedPostfix.length() - 1; i >= 0; i--) {
+        prefix += reversedPostfix[i];
+    }
+
+    return prefix;
+}
+
+int main() {
+    string infixExpression;
+
+    // Input infix expression from the user
+    cout << "Enter infix expression: ";
+    getline(cin, infixExpression);
+
+    // Convert infix to postfix
+    string postfixExpression = infixToPostfix(infixExpression);
+    cout << "Postfix expression: " << postfixExpression << endl;
+
+    // Convert infix to prefix
+    string prefixExpression = infixToPrefix(infixExpression);
+    cout << "Prefix expression: " << prefixExpression << endl;
+
+    return 0;
+}

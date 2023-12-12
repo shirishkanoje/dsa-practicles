@@ -1,0 +1,107 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+// Define a structure to represent a student
+struct Student {
+    int rollNo;
+    string name;
+    float sgpa;
+};
+
+// Helper function for Quick Sort to partition the array
+int myPartition(Student students[], int low, int high) {
+    float pivot = students[high].sgpa;
+    int i = low - 1;
+    for (int j = low; j <= high - 1; j++) {
+        if (students[j].sgpa >= pivot) {
+            i++;
+            swap(students[i], students[j]);
+        }
+    }
+    swap(students[i + 1], students[high]);
+    return i + 1;
+}
+
+void quickSort(Student students[], int low, int high) {
+    if (low < high) {
+        int pivot = myPartition(students, low, high);
+        quickSort(students, low, pivot - 1);
+        quickSort(students, pivot + 1, high);
+    }
+}
+
+// Function to search for students based on SGPA
+vector<Student> searchBySGPA(Student students[], int n, float targetSGPA) {
+    vector<Student> matchingStudents;
+    for (int i = 0; i < n; i++) {
+        if (students[i].sgpa == targetSGPA) {
+            matchingStudents.push_back(students[i]);
+        }
+    }
+    return matchingStudents;
+}
+
+int main() {
+    const int maxSize = 15;  // Maximum number of students
+    Student students[maxSize];
+
+    // Input student data for at least 15 students
+    int n;
+    cout << "Enter the number of students (at least 15): ";
+    cin >> n;
+
+    if (n < 15 || n > maxSize) {
+        cout << "Invalid number of students. Please enter at least 15 students." << endl;
+        return 1;
+    }
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter Roll No for student " << i + 1 << ": ";
+        cin >> students[i].rollNo;
+        cout << "Enter Name for student " << i + 1 << ": ";
+        cin.ignore(); // Clear the newline character left in the input buffer
+        getline(cin, students[i].name);
+        cout << "Enter SGPA for student " << i + 1 << ": ";
+        cin >> students[i].sgpa;
+    }
+
+    // c) Arrange list of students to find out first ten toppers from a class (Quick Sort)
+    quickSort(students, 0, n - 1);
+
+    // Display the sorted student database (sorted by SGPA)
+    cout << "\nStudent Database (Sorted by SGPA):\n";
+    cout << "---------------------------------\n";
+    cout << "Roll No\tName\tSGPA\n";
+
+    for (int i = 0; i < n; i++) {
+        cout << students[i].rollNo << "\t" << students[i].name << "\t" << students[i].sgpa << endl;
+    }
+
+    cout << "---------------------------------\n";
+
+    // d) Search students according to SGPA
+    float targetSGPA;
+    cout << "Enter SGPA to search: ";
+    cin >> targetSGPA;
+
+    vector<Student> matchingStudents = searchBySGPA(students, n, targetSGPA);
+
+    if (!matchingStudents.empty()) {
+        cout << "\nStudents with SGPA " << targetSGPA << ":\n";
+        cout << "-----------------------------\n";
+        cout << "Roll No\tName\tSGPA\n";
+
+        for (const auto& student : matchingStudents) {
+            cout << student.rollNo << "\t" << student.name << "\t" << student.sgpa << endl;
+        }
+
+        cout << "-----------------------------\n";
+    } else {
+        cout << "No students found with SGPA " << targetSGPA << endl;
+    }
+
+    return 0;
+}

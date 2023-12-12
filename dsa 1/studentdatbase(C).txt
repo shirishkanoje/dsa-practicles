@@ -1,0 +1,131 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// Structure to represent a student
+struct Student {
+    int rollNumber;
+    char name[50];
+    char division;
+    char address[100];
+};
+
+// Function to add a new student record to the file
+void addStudent(FILE *file) {
+    struct Student student;
+
+    printf("Enter Roll Number: ");
+    scanf("%d", &student.rollNumber);
+
+    printf("Enter Name: ");
+    scanf("%s", student.name);
+
+    printf("Enter Division: ");
+    scanf(" %c", &student.division);
+
+    printf("Enter Address: ");
+    scanf("%s", student.address);
+
+    // Write the student record to the file
+    fwrite(&student, sizeof(struct Student), 1, file);
+
+    printf("Student added successfully.\n");
+}
+
+// Function to display details of a particular student
+void displayStudent(FILE *file, int rollNumber) {
+    struct Student student;
+    int found = 0;
+
+    // Rewind the file to the beginning
+    rewind(file);
+
+    // Search for the student record
+    while (fread(&student, sizeof(struct Student), 1, file) == 1) {
+        if (student.rollNumber == rollNumber) {
+            found = 1;
+            printf("Roll Number: %d\n", student.rollNumber);
+            printf("Name: %s\n", student.name);
+            printf("Division: %c\n", student.division);
+            printf("Address: %s\n", student.address);
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Student with Roll Number %d not found.\n", rollNumber);
+    }
+}
+
+// Function to delete a student record
+void deleteStudent(FILE *file, int rollNumber) {
+    struct Student student, temp;
+
+    FILE *tempFile = fopen("temp.dat", "w");
+
+    // Rewind the file to the beginning
+    rewind(file);
+
+    // Copy records to a temporary file, skipping the record to be deleted
+    while (fread(&temp, sizeof(struct Student), 1, file) == 1) {
+        if (temp.rollNumber != rollNumber) {
+            fwrite(&temp, sizeof(struct Student), 1, tempFile);
+        }
+    }
+
+    fclose(file);
+    fclose(tempFile);
+
+    // Remove the original file and rename the temporary file
+    remove("students.dat");
+    rename("temp.dat", "students.dat");
+
+    printf("Student with Roll Number %d deleted successfully.\n", rollNumber);
+}
+
+int main() {
+    FILE *file = fopen("students.dat", "ab+");
+
+    if (file == NULL) {
+        printf("Error opening file.\n");
+        return 1; // Return with an error code
+    }
+
+    int choice, rollNumber;
+
+    do {
+        printf("\nStudent Database Management System\n");
+        printf("1. Add Student\n");
+        printf("2. Display Student Details\n");
+        printf("3. Delete Student\n");
+        printf("4. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addStudent(file);
+                break;
+            case 2:
+                printf("Enter Roll Number to display details: ");
+                scanf("%d", &rollNumber);
+                displayStudent(file, rollNumber);
+                break;
+            case 3:
+                printf("Enter Roll Number to delete: ");
+                scanf("%d", &rollNumber);
+                deleteStudent(file, rollNumber);
+                break;
+            case 4:
+                printf("Exiting program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please enter a valid option.\n");
+        }
+
+    } while (choice != 4);
+
+    fclose(file);
+
+    return 0;
+}

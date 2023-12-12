@@ -1,0 +1,78 @@
+
+#include <iostream>
+using namespace std;
+
+class TreeNode {
+public:
+    int data;
+    TreeNode* left;
+    TreeNode* right;
+
+    TreeNode(int value) {
+        data = value;
+        left = right = nullptr;
+    }
+};
+
+class BinaryTree {
+public:
+    TreeNode* root;
+
+    BinaryTree() {
+        root = nullptr;
+    }
+
+    // Helper function to perform in-order traversal
+    void inOrderTraversal(TreeNode* root) {
+        if (root != nullptr) {
+            inOrderTraversal(root->left);
+            cout << root->data << " ";
+            inOrderTraversal(root->right);
+        }
+    }
+
+    // Helper function to perform pre-order traversal
+    void preOrderTraversal(TreeNode* root) {
+        if (root != nullptr) {
+            cout << root->data << " ";
+            preOrderTraversal(root->left);
+            preOrderTraversal(root->right);
+        }
+    }
+
+    // Helper function to perform post-order traversal
+    void postOrderTraversal(TreeNode* root) {
+        if (root != nullptr) {
+            postOrderTraversal(root->left);
+            postOrderTraversal(root->right);
+            cout << root->data << " ";
+        }
+    }
+};
+
+int main() {
+    BinaryTree tree;
+
+    // Constructing a sample binary tree
+    tree.root = new TreeNode(1);
+    tree.root->left = new TreeNode(2);
+    tree.root->right = new TreeNode(3);
+    tree.root->left->left = new TreeNode(4);
+    tree.root->left->right = new TreeNode(5);
+    tree.root->right->left = new TreeNode(6);
+    tree.root->right->right = new TreeNode(7);
+
+    cout << "In-order Traversal: ";
+    tree.inOrderTraversal(tree.root);
+    cout << endl;
+
+    cout << "Pre-order Traversal: ";
+    tree.preOrderTraversal(tree.root);
+    cout << endl;
+
+    cout << "Post-order Traversal: ";
+    tree.postOrderTraversal(tree.root);
+    cout << endl;
+
+    return 0;
+}

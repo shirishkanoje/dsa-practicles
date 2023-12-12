@@ -1,0 +1,101 @@
+#include <iostream>
+#include <stack>
+#include <cctype>
+
+using namespace std;
+
+// Node structure for the Expression Tree
+struct TreeNode {
+    char data;
+    TreeNode* left;
+    TreeNode* right;
+
+    TreeNode(char val) : data(val), left(nullptr), right(nullptr) {}
+};
+
+// Function to check if a character is an operator
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/');
+}
+
+// Function to construct an Expression Tree from a postfix expression
+TreeNode* constructExpressionTreeFromPostfix(const string& postfix) {
+    stack<TreeNode*> nodeStack;
+
+    for (char c : postfix) {
+        if (isalnum(c)) {
+            // Operand, create a new node
+            nodeStack.push(new TreeNode(c));
+        } else if (isOperator(c)) {
+            // Operator, create a new node and set its children
+            TreeNode* newNode = new TreeNode(c);
+            newNode->right = nodeStack.top();
+            nodeStack.pop();
+            newNode->left = nodeStack.top();
+            nodeStack.pop();
+
+            // Push the new node back onto the stack
+            nodeStack.push(newNode);
+        }
+    }
+
+    // The final node on the stack is the root of the Expression Tree
+    return nodeStack.top();
+}
+
+// Function to construct an Expression Tree from a prefix expression
+TreeNode* constructExpressionTreeFromPrefix(const string& prefix) {
+    stack<TreeNode*> nodeStack;
+
+    // Traverse the prefix expression in reverse order
+    for (int i = prefix.size() - 1; i >= 0; --i) {
+        char c = prefix[i];
+
+        if (isalnum(c)) {
+            // Operand, create a new node
+            nodeStack.push(new TreeNode(c));
+        } else if (isOperator(c)) {
+            // Operator, create a new node and set its children
+            TreeNode* newNode = new TreeNode(c);
+            newNode->left = nodeStack.top();
+            nodeStack.pop();
+            newNode->right = nodeStack.top();
+            nodeStack.pop();
+
+            // Push the new node back onto the stack
+            nodeStack.push(newNode);
+        }
+    }
+
+    // The final node on the stack is the root of the Expression Tree
+    return nodeStack.top();
+}
+
+// Function to display the Expression Tree in an in-order traversal
+void displayExpressionTree(TreeNode* root) {
+    if (root) {
+        displayExpressionTree(root->left);
+        cout << root->data << " ";
+        displayExpressionTree(root->right);
+    }
+}
+
+int main() {
+    // Example postfix and prefix expressions
+    string postfixExpression = "AB+";
+    string prefixExpression = "+AB";
+
+    // Construct Expression Tree from postfix expression
+    TreeNode* postfixRoot = constructExpressionTreeFromPostfix(postfixExpression);
+    cout << "Expression Tree from Postfix: ";
+    displayExpressionTree(postfixRoot);
+    cout << endl;
+
+    // Construct Expression Tree from prefix expression
+    TreeNode* prefixRoot = constructExpressionTreeFromPrefix(prefixExpression);
+    cout << "Expression Tree from Prefix: ";
+    displayExpressionTree(prefixRoot);
+    cout << endl;
+
+    return 0;
+}

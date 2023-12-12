@@ -1,0 +1,63 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
+// Define a structure to represent a student
+struct Student {
+    int rollNo;
+    string name;
+    float sgpa;
+};
+
+// Function to perform insertion sort on an array of students based on name
+void insertionSort(Student students[], int n) {
+    for (int i = 1; i < n; i++) {
+        Student key = students[i];
+        int j = i - 1;
+
+        // Move elements of students[0..i-1] that are greater than key.name to one position ahead of their current position
+        while (j >= 0 && students[j].name > key.name) {
+            students[j + 1] = students[j];
+            j = j - 1;
+        }
+
+        students[j + 1] = key;
+    }
+}
+
+int main() {
+    const int minSize = 15;  // Minimum number of students required
+    const int maxSize = 50;  // Maximum number of students
+    Student students[maxSize];
+
+    int n;
+    do {
+        cout << "Enter the number of students (at least 15, up to 50): ";
+        cin >> n;
+
+        if (n < minSize || n > maxSize) {
+            cout << "Invalid number of students. Please enter at least 15 students.\n";
+        }
+    } while (n < minSize || n > maxSize);
+
+    for (int i = 0; i < n; i++) {
+        cout << "Enter Roll No for student " << i + 1 << ": ";
+        cin >> students[i].rollNo;
+        cout << "Enter Name for student " << i + 1 << ": ";
+        cin >> students[i].name;
+        cout << "Enter SGPA for student " << i + 1 << ": ";
+        cin >> students[i].sgpa;
+    }
+
+    insertionSort(students, n);
+
+    // Display the sorted student list alphabetically
+    cout << "\nStudent List (Sorted by Name in Alphabetical Order):\n";
+    cout << "----------------------------------------------\n";
+    cout << "Roll No\tName\tSGPA\n";
+    for (int i = 0; i < n; i++) {
+        cout << students[i].rollNo << "\t" << students[i].name << "\t" << students[i].sgpa << endl;
+    }
+
+    return 0;
+}

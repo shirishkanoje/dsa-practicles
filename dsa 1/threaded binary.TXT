@@ -1,0 +1,81 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure for a threaded binary tree node
+struct TreeNode {
+    int data;
+    struct TreeNode* left;
+    struct TreeNode* right;
+    int isThreaded; // 1 if right points to in-order successor, 0 if right points to a child
+};
+
+// Function to create a new threaded binary tree node
+struct TreeNode* createNode(int data) {
+    struct TreeNode* newNode = (struct TreeNode*)malloc(sizeof(struct TreeNode));
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    newNode->isThreaded = 0;
+    return newNode;
+}
+
+// Function to perform in-order threading of a binary tree
+void threadedInOrder(struct TreeNode* root, struct TreeNode** prev) {
+    if (root == NULL)
+        return;
+
+    threadedInOrder(root->left, prev);
+
+    if (*prev && (*prev)->right == NULL) {
+        (*prev)->right = root;
+        (*prev)->isThreaded = 1;
+    }
+
+    *prev = root;
+
+    threadedInOrder(root->right, prev);
+}
+
+// Function to traverse the threaded tree in in-order
+void inOrderTraversal(struct TreeNode* root) {
+    if (root == NULL)
+        return;
+
+    struct TreeNode* current = root;
+
+    while (current->left)
+        current = current->left;
+
+    while (current) {
+        printf("%d ", current->data);
+
+        if (current->isThreaded)
+            current = current->right;
+        else {
+            current = current->right;
+            while (current && !current->isThreaded)
+                current = current->left;
+        }
+    }
+}
+
+
+int main() {
+    struct TreeNode* root = createNode(1);
+    root->left = createNode(2);
+    root->right = createNode(3);
+    root->left->left = createNode(4);
+    root->left->right = createNode(5);
+    root->right->left = createNode(6);
+    root->right->right = createNode(7);
+
+    struct TreeNode* prev = NULL;
+    threadedInOrder(root, &prev);
+
+    printf("In-Order Traversal: ");
+    inOrderTraversal(root);
+    printf("\n");
+
+
+    return 0;
+}

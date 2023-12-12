@@ -1,0 +1,83 @@
+#include <iostream>
+#include <stack>
+#include <string>
+#include <sstream>
+
+using namespace std;
+
+bool isOperator(char c) {
+    return (c == '+' || c == '-' || c == '*' || c == '/');
+}
+
+int performOperation(char operation, int operand1, int operand2) {
+    switch (operation) {
+        case '+':
+            return operand1 + operand2;
+        case '-':
+            return operand1 - operand2;
+        case '*':
+            return operand1 * operand2;
+        case '/':
+            if (operand2 != 0)
+                return operand1 / operand2;
+            else
+                throw invalid_argument("Division by zero");
+    }
+    return 0; // This should never happen if the input is valid.
+}
+
+int evaluatePrefixExpression(const string& expression) {
+    stack<int> operandStack;
+
+    for (int i = expression.length() - 1; i >= 0; i--) {
+        char currentChar = expression[i];
+
+        if (isdigit(currentChar)) {
+            operandStack.push(currentChar - '0'); // Convert char to int
+        } else if (isOperator(currentChar)) {
+            int operand1 = operandStack.top();
+            operandStack.pop();
+            int operand2 = operandStack.top();
+            operandStack.pop();
+            int result = performOperation(currentChar, operand1, operand2);
+            operandStack.push(result);
+        }
+    }
+
+    return operandStack.top();
+}
+
+int evaluatePostfixExpression(const string& expression) {
+    stack<int> operandStack;
+
+    istringstream iss(expression);
+    string token;
+    
+    while (iss >> token) {
+        if (isdigit(token[0])) {
+            operandStack.push(stoi(token));
+        } else if (isOperator(token[0])) {
+            int operand2 = operandStack.top();
+            operandStack.pop();
+            int operand1 = operandStack.top();
+            operandStack.pop();
+            int result = performOperation(token[0], operand1, operand2);
+            operandStack.push(result);
+        }
+    }
+
+    return operandStack.top();
+}
+
+int main() {
+    string prefixExpression = "+ 5 * 4 7";
+    string postfixExpression = "5 4 7 * +";
+
+    int result1 = evaluatePrefixExpression(prefixExpression);
+    int result2 = evaluatePostfixExpression(postfixExpression);
+
+    cout << "Result of Prefix Expression: " << result1 << endl;
+    cout << "Result of Postfix Expression: " << result2 << endl;
+
+    return 0;
+}

@@ -1,0 +1,135 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+struct TreeNode {
+    int data;
+    struct TreeNode *left;
+    struct TreeNode *right;
+};
+
+typedef struct TreeNode Node;
+
+Node *createNode(int data) {
+    Node *newNode = (Node *)malloc(sizeof(Node));
+    newNode->data = data;
+    newNode->left = NULL;
+    newNode->right = NULL;
+    return newNode;
+}
+
+Node *insert(Node *root, int data) {
+    if (root == NULL) {
+        return createNode(data);
+    }
+
+    if (data < root->data) {
+        root->left = insert(root->left, data);
+    } else if (data > root->data) {
+        root->right = insert(root->right, data);
+    }
+
+    return root;
+}
+
+void displayDepth(Node *root, int depth) {
+    if (root == NULL) {
+        return;
+    }
+
+    printf("Depth of %d: %d\n", root->data, depth);
+    displayDepth(root->left, depth + 1);
+    displayDepth(root->right, depth + 1);
+}
+
+void displayParentChildNodes(Node *root) {
+    if (root == NULL) {
+        return;
+    }
+
+    if (root->left != NULL) {
+        printf("Parent: %d, Left Child: %d\n", root->data, root->left->data);
+        displayParentChildNodes(root->left);
+    }
+
+    if (root->right != NULL) {
+        printf("Parent: %d, Right Child: %d\n", root->data, root->right->data);
+        displayParentChildNodes(root->right);
+    }
+}
+
+void displayLeafNodes(Node *root) {
+    if (root == NULL) {
+        return;
+    }
+
+    if (root->left == NULL && root->right == NULL) {
+        printf("Leaf Node: %d\n", root->data);
+    }
+
+    displayLeafNodes(root->left);
+    displayLeafNodes(root->right);
+}
+
+void displayTreeLevelWise(Node *root, int level) {
+    if (root == NULL) {
+        return;
+    }
+
+    if (level == 1) {
+        printf("%d ", root->data);
+    } else if (level > 1) {
+        displayTreeLevelWise(root->left, level - 1);
+        displayTreeLevelWise(root->right, level - 1);
+    }
+}
+
+int getHeight(Node *root) {
+    if (root == NULL) {
+        return 0;
+    }
+
+    int leftHeight = getHeight(root->left);
+    int rightHeight = getHeight(root->right);
+
+    return (leftHeight > rightHeight) ? (leftHeight + 1) : (rightHeight + 1);
+}
+
+void displayTreeLevelWiseWrapper(Node *root) {
+    int height = getHeight(root);
+    for (int i = 1; i <= height; i++) {
+        printf("Level %d: ", i);
+        displayTreeLevelWise(root, i);
+        printf("\n");
+    }
+}
+
+int main() {
+    Node *root = NULL;
+
+    // Insert nodes into the binary search tree
+    root = insert(root, 5);
+    insert(root, 3);
+    insert(root, 7);
+    insert(root, 2);
+    insert(root, 4);
+    insert(root, 6);
+    insert(root, 8);
+
+    // Display the depth of the tree
+    printf("Depth of the tree:\n");
+    displayDepth(root, 0);
+
+    // Display parent nodes with their child nodes
+    printf("\nParent and Child Nodes:\n");
+    displayParentChildNodes(root);
+
+    // Display leaf nodes
+    printf("\nLeaf Nodes:\n");
+    displayLeafNodes(root);
+
+    // Display tree level wise
+    printf("\nTree Level Wise:\n");
+    displayTreeLevelWiseWrapper(root);
+
+    return 0;
+}
